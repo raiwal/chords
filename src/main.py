@@ -43,7 +43,8 @@ chord_template = jetson.utils.loadImage('/home/rainer/project/chords/images/chor
 
 # process frames until the user exits
 while True:
-
+	# chord_map = chord_template
+	chord_map = jetson.utils.cudaMemcpy(chord_template)
 	# capture the next image
 	img = input.Capture()
 
@@ -54,14 +55,16 @@ while True:
 
 	# find the object description
 	class_desc = net.GetClassDesc(class_id)
-	chordlayout.draw_C_major(chord_template)
+	# chordlayout.draw_C_major(chord_template)
+	chordlayout.chord_drawing(class_desc, chord_map)
 
 	# overlay the result on the image	
 	font.OverlayText(img, img.width, img.height, "{:05.2f}% {:s}".format(confidence * 100, class_desc), 5, 5, font.White, font.Gray40)
 	
 	imgOutput = jetson.utils.cudaAllocMapped(width=1280, height=720, format=img.format)
+	# Position chordmap 
 	jetson.utils.cudaOverlay(img, imgOutput, 0,0)	# render the image
-	jetson.utils.cudaOverlay(chord_template, imgOutput, 1050, 450)	# render the image
+	jetson.utils.cudaOverlay(chord_map, imgOutput, 1050, 450)	# render the image
 	output.Render(imgOutput)
 
 	# update the title bar

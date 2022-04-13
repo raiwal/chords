@@ -1,3 +1,7 @@
+model
+process.py
+chords.py
+chord.py
 
 # Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode,python,linux
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,python,linux

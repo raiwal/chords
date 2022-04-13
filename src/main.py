@@ -1,5 +1,6 @@
 import jetson.inference
 import jetson.utils
+import chordlayout
 
 import argparse
 import sys
@@ -36,9 +37,9 @@ input = jetson.utils.videoSource(opt.input_URI, argv=sys.argv)
 output = jetson.utils.videoOutput(opt.output_URI, argv=sys.argv+is_headless)
 font = jetson.utils.cudaFont()
 
-# Start: chords
-chord_template = jetson.utils.loadImage('../images/chord_chart.jpg')
-# End: chords 
+# Load template for six string guitar
+chord_template = jetson.utils.loadImage('/home/rainer/project/chords/images/chord_chart.jpg')
+
 
 # process frames until the user exits
 while True:
@@ -53,6 +54,7 @@ while True:
 
 	# find the object description
 	class_desc = net.GetClassDesc(class_id)
+	chordlayout.draw_C_major(chord_template)
 
 	# overlay the result on the image	
 	font.OverlayText(img, img.width, img.height, "{:05.2f}% {:s}".format(confidence * 100, class_desc), 5, 5, font.White, font.Gray40)
@@ -63,7 +65,7 @@ while True:
 	output.Render(imgOutput)
 
 	# update the title bar
-	output.SetStatus("{:s} | Network {:.0f} FPS".format(net.GetNetworkName(), net.GetNetworkFPS()))
+	#output.SetStatus("{:s} | Network {:.0f} FPS".format(net.GetNetworkName(), net.GetNetworkFPS()))
 
 	# print out performance info
 	# net.PrintProfilerTimes()

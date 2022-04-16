@@ -7,7 +7,7 @@ import sys
 
 
 # parse the command line
-parser = argparse.ArgumentParser(description="Classify a live camera stream using an image recognition DNN.", 
+parser = argparse.ArgumentParser(description="Classify basic guitarchords from a live camera stream using an image recognition DNN.", 
                                  formatter_class=argparse.RawTextHelpFormatter, epilog=jetson.inference.imageNet.Usage() +
                                  jetson.utils.videoSource.Usage() + jetson.utils.videoOutput.Usage() + jetson.utils.logUsage())
 
@@ -18,6 +18,7 @@ parser.add_argument("--camera", type=str, default="0", help="index of the MIPI C
 parser.add_argument("--width", type=int, default=1280, help="desired width of camera stream (default is 1280 pixels)")
 parser.add_argument("--height", type=int, default=720, help="desired height of camera stream (default is 720 pixels)")
 parser.add_argument('--headless', action='store_true', default=(), help="run without display")
+parser.add_argument("--seventh", type=str, default="no", help="display fingering of sevent chord of current chord")
 
 is_headless = ["--headless"] if sys.argv[0].find('console.py') != -1 else [""]
 
@@ -27,6 +28,12 @@ except:
 	print("")
 	parser.print_help()
 	sys.exit(0)
+# Circle of fifth, default is to show recognized chord
+cof = False
+
+if opt.seventh == 'yes':
+	cof = True
+	print("OK. Seventh is displayed")
 
 
 # load the recognition network
@@ -38,7 +45,7 @@ output = jetson.utils.videoOutput(opt.output_URI, argv=sys.argv+is_headless)
 font = jetson.utils.cudaFont()
 
 # Load template for six string guitar
-chord_template = jetson.utils.loadImage('/home/rainer/project/chords/images/chord_chart.jpg')
+chord_template = jetson.utils.loadImage('../images/chord_chart.jpg')
 
 
 # process frames until the user exits
@@ -68,7 +75,7 @@ while True:
 	output.Render(imgOutput)
 
 	# update the title bar
-	#output.SetStatus("{:s} | Network {:.0f} FPS".format(net.GetNetworkName(), net.GetNetworkFPS()))
+	output.SetStatus("{:s} | Network {:.0f} FPS".format(net.GetNetworkName(), net.GetNetworkFPS()))
 
 	# print out performance info
 	# net.PrintProfilerTimes()

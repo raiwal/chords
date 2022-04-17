@@ -9,7 +9,6 @@ open_G_string = (106, 38)
 open_B_string = (137, 38)
 open_e_string = (170, 38)
 
-
 F_from_E_string = (10, 70)
 G_from_E_string = (10, 130)
 

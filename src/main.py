@@ -1,10 +1,8 @@
 import jetson.inference
 import jetson.utils
-import chordlayout
-
+import chords
 import argparse
 import sys
-
 
 # parse the command line
 parser = argparse.ArgumentParser(description="Classify basic guitarchords from a live camera stream using an image recognition DNN.", 
@@ -13,12 +11,13 @@ parser = argparse.ArgumentParser(description="Classify basic guitarchords from a
 
 parser.add_argument("input_URI", type=str, default="", nargs='?', help="URI of the input stream")
 parser.add_argument("output_URI", type=str, default="", nargs='?', help="URI of the output stream")
-parser.add_argument("--network", type=str, default="googlenet", help="pre-trained model to load (see below for options)")
+# this was googlenet
+parser.add_argument("--network", type=str, default="resnet-18", help="pre-trained model to load (see below for options)")
 parser.add_argument("--camera", type=str, default="0", help="index of the MIPI CSI camera to use (e.g. CSI camera 0)\nor for VL42 cameras, the /dev/video device to use.\nby default, MIPI CSI camera 0 will be used.")
 parser.add_argument("--width", type=int, default=1280, help="desired width of camera stream (default is 1280 pixels)")
 parser.add_argument("--height", type=int, default=720, help="desired height of camera stream (default is 720 pixels)")
-parser.add_argument('--headless', action='store_true', default=(), help="run without display")
-parser.add_argument("--seventh", type=str, default="no", help="display fingering of sevent chord of current chord")
+parser.add_argument("--headless", action='store_true', default=(), help="run without display")
+parser.add_argument("--chord_extension", type=str, default="no", help="display fingering extended chord. Seventh or are currently supported")
 
 is_headless = ["--headless"] if sys.argv[0].find('console.py') != -1 else [""]
 
@@ -28,14 +27,15 @@ except:
 	print("")
 	parser.print_help()
 	sys.exit(0)
-# Circle of fifth, default is to show recognized chord
-cof = False
 
-if opt.seventh == 'yes':
-	cof = True
+if opt.chord_extension == 'seventh':
 	print("OK. Seventh is displayed")
+if opt.chord_extension == 'ninth':
+	print("OK. Ninth is displayed")
 
-
+#print(opt.network)
+#print(sys.argv)
+#sys.exit(0)
 # load the recognition network
 net = jetson.inference.imageNet(opt.network, sys.argv)
 
@@ -45,8 +45,7 @@ output = jetson.utils.videoOutput(opt.output_URI, argv=sys.argv+is_headless)
 font = jetson.utils.cudaFont()
 
 # Load template for six string guitar
-chord_template = jetson.utils.loadImage('../images/chord_chart.jpg')
-
+chord_template = jetson.utils.loadImage('../images/chord_chart_with_treble_clef.png')
 
 # process frames until the user exits
 while True:
@@ -63,7 +62,7 @@ while True:
 	# find the object description
 	class_desc = net.GetClassDesc(class_id)
 	# chordlayout.draw_C_major(chord_template)
-	chordlayout.chord_drawing(class_desc, chord_map)
+	chords.chord_drawing(class_desc, chord_map, opt.chord_extension)
 
 	# overlay the result on the image	
 	font.OverlayText(img, img.width, img.height, "{:05.2f}% {:s}".format(confidence * 100, class_desc), 5, 5, font.White, font.Gray40)
@@ -71,7 +70,7 @@ while True:
 	imgOutput = jetson.utils.cudaAllocMapped(width=1280, height=720, format=img.format)
 	# Position chordmap 
 	jetson.utils.cudaOverlay(img, imgOutput, 0,0)	# render the image
-	jetson.utils.cudaOverlay(chord_map, imgOutput, 1050, 450)	# render the image
+	jetson.utils.cudaOverlay(chord_map, imgOutput, 950, 450)	# render the chord map image
 	output.Render(imgOutput)
 
 	# update the title bar

@@ -1,20 +1,24 @@
 import jetson.inference
 import jetson.utils
-import chords
 import argparse
 import sys
 
+import chords
+
 # parse the command line
-parser = argparse.ArgumentParser(description="Classify basic guitarchords from a live camera stream using an image recognition DNN.", 
+parser = argparse.ArgumentParser(description="Classify a live camera stream using an image recognition DNN.", 
                                  formatter_class=argparse.RawTextHelpFormatter, epilog=jetson.inference.imageNet.Usage() +
                                  jetson.utils.videoSource.Usage() + jetson.utils.videoOutput.Usage() + jetson.utils.logUsage())
 
 parser.add_argument("input_URI", type=str, default="", nargs='?', help="URI of the input stream")
 parser.add_argument("output_URI", type=str, default="", nargs='?', help="URI of the output stream")
-parser.add_argument("--network", type=str, default="resnet-18", help="pre-trained model to load (see below for options)")
+parser.add_argument("--network", type=str, default="googlenet", help="pre-trained model to load (see below for options)")
 parser.add_argument("--camera", type=str, default="0", help="index of the MIPI CSI camera to use (e.g. CSI camera 0)\nor for VL42 cameras, the /dev/video device to use.\nby default, MIPI CSI camera 0 will be used.")
 parser.add_argument("--width", type=int, default=1280, help="desired width of camera stream (default is 1280 pixels)")
 parser.add_argument("--height", type=int, default=720, help="desired height of camera stream (default is 720 pixels)")
+parser.add_argument('--headless', action='store_true', default=(), help="run without display")
+
+is_headless = ["--headless"] if sys.argv[0].find('console.py') != -1 else [""]
 
 # Upper left corner coordinates for drawn chordmap
 chordmap_location_x = 30
@@ -34,7 +38,7 @@ net = jetson.inference.imageNet(opt.network, sys.argv)
 
 # create video sources & outputs
 input = jetson.utils.videoSource(opt.input_URI, argv=sys.argv)
-output = jetson.utils.videoOutput(opt.output_URI, argv=sys.argv) 
+output = jetson.utils.videoOutput(opt.output_URI, argv=sys.argv+is_headless) 
 font = jetson.utils.cudaFont()
 
 # Load template for six string guitar
@@ -42,7 +46,9 @@ chord_template = jetson.utils.loadImage('../images/chord_chart_with_treble_clef.
 
 # process frames until the user exits
 while True:
+	# empty chordmap is needed for chord changes 
 	chord_map = jetson.utils.cudaMemcpy(chord_template)
+
 	# capture the next image
 	img = input.Capture()
 
@@ -52,6 +58,7 @@ while True:
 	# find the object description
 	class_desc = net.GetClassDesc(class_id)
 
+	# draw chordmap and staff
 	chords.chord_drawing(class_desc, chord_map)
 
 	# overlay the result on the image	
@@ -61,6 +68,7 @@ while True:
 	# Position chordmap with the camera image
 	jetson.utils.cudaOverlay(img, imgOutput, 0,0)
 	jetson.utils.cudaOverlay(chord_map, imgOutput, chordmap_location_x, chordmap_location_y)	
+	# Render final image
 	output.Render(imgOutput)
 
 	# update the title bar net.GetNetworkName()

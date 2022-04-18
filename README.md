@@ -38,6 +38,9 @@ Open position:
 * G-major
 * F-major
 
+# Demonstration
+[Chord detection video](https://youtu.be/rJi4u-VNLqs)
+
 # Miscelanneus
 * Training was done using Washburn D10, Fender Stratocaster, and Gibson Flying V.
 

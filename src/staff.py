@@ -79,7 +79,7 @@ def draw_F_major(frame):
     jetson.utils.cudaDrawCircle(frame, (staff_x, staff_F4), radius, notecolor)      
     jetson.utils.cudaDrawCircle(frame, (staff_x, staff_A4), radius, notecolor)      
     jetson.utils.cudaDrawCircle(frame, (staff_x, staff_C5), radius, notecolor)      
-    jetson.utils.cudaDrawCircle(frame, (staff_x, staff_E5), radius, notecolor)   
+    jetson.utils.cudaDrawCircle(frame, (staff_x, staff_F5), radius, notecolor)   
 
 
 def draw_G_major(frame):

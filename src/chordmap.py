@@ -49,18 +49,22 @@ D_from_B_string = (B_string, fret_3)
 F_from_e_string = (e_string, fret_1)
 G_from_e_string = (e_string, fret_3)
 
+font = jetson.utils.cudaFont()
+chord_info_x = 10
+chord_info_y = 10
 
 def draw_A_minor(frame):
     jetson.utils.cudaDrawCircle(frame, E_from_D_string, radius, notecolor)   
     jetson.utils.cudaDrawCircle(frame, A_from_G_string, radius, notecolor)   
     jetson.utils.cudaDrawCircle(frame, C_from_B_string, radius, notecolor)   
+    font.OverlayText(frame, frame.width, frame.height, "A-minor", chord_info_x, chord_info_y, font.Black, font.Gray40)
 
 
 def draw_C_major(frame):
     jetson.utils.cudaDrawCircle(frame, C_from_A_string, radius, notecolor)   
     jetson.utils.cudaDrawCircle(frame, E_from_D_string, radius, notecolor)   
     jetson.utils.cudaDrawCircle(frame, C_from_B_string, radius, notecolor)   
-
+    font.OverlayText(frame, frame.width, frame.height, "C-major", chord_info_x, chord_info_y, font.Black, font.Gray40)
 
 def draw_D_minor(frame):
     jetson.utils.cudaDrawCircle(frame, A_from_G_string, radius, notecolor)   
@@ -68,12 +72,12 @@ def draw_D_minor(frame):
     jetson.utils.cudaDrawCircle(frame, F_from_e_string, radius, notecolor)   
     jetson.utils.cudaDrawLine(frame, (E_string_x1, E_string_y1), (E_string_x2, E_string_y2), notecolor, no_play_line_width) # E-is not part of D-minor so we draw cross here
     jetson.utils.cudaDrawLine(frame, (E_string_x1, E_string_y2), (E_string_x2, E_string_y1), notecolor, no_play_line_width) # E-is not part of D-minor so we draw cross here
-
+    font.OverlayText(frame, frame.width, frame.height, "D-minor", chord_info_x, chord_info_y,  font.Black, font.Gray40)
  
 def draw_E_minor(frame):
     jetson.utils.cudaDrawCircle(frame, B_from_A_string, radius, notecolor)   
     jetson.utils.cudaDrawCircle(frame, E_from_D_string, radius, notecolor)   
-
+    font.OverlayText(frame, frame.width, frame.height, "E-minor", chord_info_x, chord_info_y, font.Black, font.Gray40)
 
 def draw_F_major(frame):
     jetson.utils.cudaDrawCircle(frame, F_from_E_string, radius, notecolor)   
@@ -82,9 +86,10 @@ def draw_F_major(frame):
     jetson.utils.cudaDrawCircle(frame, A_from_G_string, radius, notecolor)   
     jetson.utils.cudaDrawCircle(frame, C_from_B_string, radius, notecolor)   
     jetson.utils.cudaDrawCircle(frame, F_from_e_string, radius, notecolor)   
-
+    font.OverlayText(frame, frame.width, frame.height, "F-major", chord_info_x, chord_info_y,  font.Black, font.Gray40)
 
 def draw_G_major(frame):
     jetson.utils.cudaDrawCircle(frame, G_from_E_string, radius, notecolor)   
     jetson.utils.cudaDrawCircle(frame, B_from_A_string, radius, notecolor)   
     jetson.utils.cudaDrawCircle(frame, G_from_e_string, radius, notecolor)   
+    font.OverlayText(frame, frame.width, frame.height, "G-major", chord_info_x, chord_info_y,  font.Black, font.Gray40)
